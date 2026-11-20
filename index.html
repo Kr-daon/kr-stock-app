@@ -18,7 +18,7 @@ else {
     $('auth').hidden=false; $('app').hidden=true;
     if(user){
       try {
-        const approval=await getDoc(doc(db,'approvedUsers',user.uid));
+        const approval=await getDoc(doc(db,'allowedUsers',user.uid));
         if(!approval.exists() || approval.data().enabled!==true){
           $('authError').textContent='관리자가 승인하지 않은 계정입니다.';
           await signOut(auth);return;
