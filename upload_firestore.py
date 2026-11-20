@@ -1,15 +1,33 @@
-"""Upload generated market data to Firestore using GitHub Actions secret."""
-import json, os
-import firebase_admin
-from firebase_admin import credentials, firestore
 
-raw = os.environ.get('FIREBASE_SERVICE_ACCOUNT_JSON')
-if not raw:
-    raise RuntimeError('FIREBASE_SERVICE_ACCOUNT_JSON secret is required')
-with open('data.json', encoding='utf-8') as f:
+"""Upload generated KRX market data to Firestore using OIDC."""
+
+import json
+import firebase_admin
+from firebase_admin import firestore
+
+PROJECT_ID = "kr-stock-signal"
+
+# Load generated stock data
+with open("data.json", "r", encoding="utf-8") as f:
     payload = json.load(f)
-if not payload.get('stocks'):
-    raise RuntimeError('No stocks available; refusing to overwrite Firestore data')
-app = firebase_admin.initialize_app(credentials.Certificate(json.loads(raw)))
-firestore.client(app).collection('market').document('latest').set(payload)
-print('Uploaded', len(payload['stocks']), 'stocks to Firestore')
+
+# Prevent overwriting valid data with empty results
+if not payload.get("stocks"):
+    raise RuntimeError(
+        "No stocks available; refusing to overwrite Firestore data"
+    )
+
+# Use Google Cloud credentials from GitHub Actions OIDC
+if not firebase_admin._apps:
+    firebase_admin.initialize_app(
+        options={"projectId": PROJECT_ID}
+    )
+
+db = firestore.client()
+
+# Preserve existing Firestore document structure
+db.collection("market").document("latest").set(payload)
+
+print(
+    f"Successfully uploaded {len(payload['stocks'])} stocks to Firestore"
+)
