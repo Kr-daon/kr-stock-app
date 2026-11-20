@@ -1,8 +1,9 @@
-// Firebase Console > 프로젝트 설정 > 내 앱 > 웹 앱 구성 값을 입력하세요.
-// 이 값은 공개 클라이언트 설정이며 비밀번호나 관리자 키를 넣지 마세요.
+
+ // 국장 시그널 Firebase 웹앱 연결 설정
 export const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  appId: ""
+  apiKey: "AIzaSyAbvlyDFdqZDQVX014_hug6dR_yK-_9J-k",
+  authDomain: "kr-stock-signal.firebaseapp.com",
+  projectId: "kr-stock-signal",
+  appId: "1:557259544669:web:645c9218f565f18f25d5b4"
 };
+  
