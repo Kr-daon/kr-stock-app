@@ -3,7 +3,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1220">
 <title>국장 시그널 | 종가 기반 종목 분석</title>
 <style>
@@ -13,7 +13,7 @@ body{margin:0}
 main{max-width:1050px;margin:auto;padding:26px 18px 60px}
 header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
 .brand{font-size:25px;font-weight:850;letter-spacing:-1px}
-.sub,.muted{color:#94a3b8}
+.muted{color:#94a3b8}
 small{font-size:12px}
 .pill{border:1px solid #334155;border-radius:100px;padding:7px 12px;color:#a7f3d0;font-size:12px}
 .hero{margin:26px 0 20px;padding:25px;background:linear-gradient(115deg,#142745,#101a2b);border:1px solid #273952;border-radius:18px}
@@ -26,35 +26,33 @@ small{font-size:12px}
 input,select,button{border:1px solid #34435b;border-radius:10px;padding:11px 13px;background:#152238;color:#f8fafc;font:inherit}
 input{flex:1;min-width:170px}
 button{cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}
 button.active{background:#2563eb;border-color:#2563eb}
 .list{display:grid;gap:11px}
-.item{display:grid;grid-template-columns:46px minmax(0,1fr) 105px 92px;align-items:center;gap:12px;text-align:left;width:100%;background:#111d2f;border:1px solid #29374c;border-radius:14px;padding:15px}
+.item{display:grid;grid-template-columns:46px minmax(0,1fr) 105px 92px 46px;align-items:center;gap:12px;width:100%;background:#111d2f;border:1px solid #29374c;border-radius:14px;padding:15px}
 .item:hover{border-color:#60a5fa}
+.stockopen{border:0;background:none;text-align:left;padding:0;min-width:0}
+.stockopen:hover .stockname{text-decoration:underline}
 .rank{background:#1c314f;border-radius:10px;padding:11px;text-align:center;color:#93c5fd;font-weight:bold}
 .stockname{font-weight:750}
 .score{font-size:22px;font-weight:800;color:#7dd3fc}
 .up{color:#fb7185}
 .down{color:#60a5fa}
+.star{font-size:27px;padding:5px;border:0;background:transparent;color:#94a3b8}
+.star.saved{color:#fbbf24}
 .detail{margin-top:18px}
 .detail h2{margin-top:0}
 .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .metric{background:#0b1728;padding:13px;border-radius:10px}
-.metric strong{display:block;margin-top:7px;font-size:19px}
+.metric strong{display:block;margin-top:7px;font-size:19px;overflow-wrap:anywhere}
 .insight{background:#0b1728;border:1px solid #29374c;border-radius:12px;padding:16px;margin:16px 0}
 .insight h3{margin:0 0 10px}
 .insight p{line-height:1.65;color:#cbd5e1}
 .insight li{margin:8px 0;line-height:1.55}
 .warn{background:#312317;color:#fcdba7;border:1px solid #76502c;padding:13px;border-radius:10px;margin-top:15px;line-height:1.6}
 .empty{padding:45px 20px;text-align:center;border:1px dashed #475569;border-radius:15px;color:#cbd5e1}
+.notice{min-height:22px;color:#fbbf24;font-size:13px}
 footer{color:#94a3b8;font-size:12px;line-height:1.7;margin-top:25px}
-@media(max-width:620px){
-.stats{grid-template-columns:1fr 1fr}
-.stats .stat:last-child{grid-column:span 2}
-.item{grid-template-columns:35px minmax(0,1fr) 70px;gap:8px;padding:12px}
-.item .last{display:none}
-.metrics{grid-template-columns:1fr 1fr}
-.hero h1{font-size:21px}
-}
 .authscreen{min-height:100vh;display:grid;place-items:center;padding:22px;background:radial-gradient(circle at 50% 10%,#1b385e,#0b1220 65%)}
 .authcard{width:100%;max-width:410px;background:#111d2f;border:1px solid #34435b;border-radius:22px;padding:32px;box-shadow:0 22px 80px #0005}
 .authcard h1{font-size:27px;margin:10px 0}
@@ -66,7 +64,15 @@ footer{color:#94a3b8;font-size:12px;line-height:1.7;margin-top:25px}
 .authcard .help{font-size:12px}
 .signout{margin-left:10px;font-size:12px}
 .authrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-#app[hidden],#auth[hidden]{display:none}
+[hidden]{display:none!important}
+@media(max-width:620px){
+.stats{grid-template-columns:1fr 1fr}
+.stats .stat:last-child{grid-column:span 2}
+.item{grid-template-columns:35px minmax(0,1fr) 65px 38px;gap:8px;padding:12px}
+.item .last{display:none}
+.metrics{grid-template-columns:1fr 1fr}
+.hero h1{font-size:21px}
+}
 </style>
 </head>
 <body>
@@ -77,15 +83,16 @@ footer{color:#94a3b8;font-size:12px;line-height:1.7;margin-top:25px}
 <p>매일 장 마감 후 업데이트되는 국내 주식 분석 결과를 확인하세요.</p>
 <form id="loginForm">
 <label for="email">이메일</label>
-<input id="email" type="email" autocomplete="username" placeholder="example@email.com" required>
+<input id="email" type="email" autocomplete="username" required>
 <label for="password">비밀번호</label>
-<input id="password" type="password" autocomplete="current-password" placeholder="비밀번호 입력" minlength="6" required>
+<input id="password" type="password" autocomplete="current-password" minlength="6" required>
 <button class="primary" id="loginBtn" type="submit">로그인</button>
 </form>
 <div id="authError" class="autherror" role="alert"></div>
 <p class="help">관리자가 등록하고 승인한 계정만 접속할 수 있습니다. 회원가입은 제공하지 않습니다.</p>
 </div>
 </section>
+
 <main id="app" hidden>
 <header>
 <div class="brand">📈 국장 시그널 <small class="muted">v1.4</small></div>
@@ -94,16 +101,30 @@ footer{color:#94a3b8;font-size:12px;line-height:1.7;margin-top:25px}
 <button class="signout" id="signout">로그아웃</button>
 </div>
 </header>
+
 <section class="hero">
 <h1>장 마감 후, 당일 흐름과 추천 근거까지.</h1>
 <p>국내 주요 30개 종목의 가격 추세 · 거래량 · Wilder RSI · ATR · 20일 수익률을 종합 점수로 비교하고 당일 동향과 추천 사유를 제공합니다. 자동 주문이나 수익 보장은 제공하지 않습니다.</p>
 </section>
+
 <div class="stats">
-<div class="stat"><small class="muted">기준 거래일</small><strong id="asof">—</strong></div>
-<div class="stat"><small class="muted">분석 완료</small><strong id="count">—</strong></div>
-<div class="stat"><small class="muted">갱신 시각 (KST)</small><strong id="updated" style="font-size:16px">—</strong></div>
+<div class="stat">
+<small class="muted">기준 거래일</small>
+<strong id="asof">—</strong>
 </div>
+<div class="stat">
+<small class="muted">분석 완료</small>
+<strong id="count">—</strong>
+</div>
+<div class="stat">
+<small class="muted">갱신 시각 (KST)</small>
+<strong id="updated" style="font-size:16px">—</strong>
+</div>
+</div>
+
 <div class="controls">
+<button id="favoritesView" aria-pressed="false">☆ 관심목록 (0)</button>
+<button id="allView" class="active" aria-pressed="true">전체 종목</button>
 <input id="search" placeholder="종목명 또는 종목코드 검색" aria-label="종목 검색">
 <select id="market" aria-label="시장 선택">
 <option value="ALL">전체 시장</option>
@@ -117,130 +138,193 @@ footer{color:#94a3b8;font-size:12px;line-height:1.7;margin-top:25px}
 </select>
 <button id="reload">새로고침</button>
 </div>
+
+<div id="notice" class="notice" role="status"></div>
 <div id="list" class="list">
 <div class="empty">종목 데이터를 불러오는 중입니다.</div>
 </div>
 <section id="detail" class="panel detail" hidden></section>
 <footer>⚠️ 본 앱의 점수는 공개된 규칙에 따른 기술적 스크리닝 결과이며 투자 권유가 아닙니다. 제시된 관심·손절·목표 가격은 ATR과 과거 지지·저항을 참고한 미검증 예시이며 실제 체결·예측 가격이 아닙니다. 데이터 제공처 장애, 거래정지, 휴장일, 수정주가 등에 따라 정보가 누락되거나 지연될 수 있습니다. 당일 동향과 추천 사유는 가격·거래량 지표에서 자동 생성되며 뉴스·공시·외국인·기관 수급·재무제표는 포함되지 않습니다.</footer>
 </main>
-<script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import {getFirestore, doc, getDoc, getDocFromServer} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-import {firebaseConfig} from "./firebase-config.js";
 
-let stocks=[], meta={}, db;
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import {getFirestore,doc,getDoc,getDocFromServer,collection,onSnapshot,setDoc,deleteDoc,serverTimestamp} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
+import {firebaseConfig} from './firebase-config.js';
+
 const $=id=>document.getElementById(id);
-const fmt=n=>Number(n).toLocaleString('ko-KR');
-const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+const fmt=n=>Number.isFinite(Number(n))?Number(n).toLocaleString('ko-KR'):'—';
+const money=n=>n==null?'—':fmt(n)+'원';
+const number=n=>Number.isFinite(Number(n))?Number(n):0;
+
+let stocks=[],meta={},db,auth,currentUser=null,favorites=new Set(),pending=new Set(),favoritesReady=false,view='all',unsubscribeFavorites=null,authGeneration=0;
+
+function notice(message){
+  $('notice').textContent=message||'';
+}
+
+function updateViewButtons(){
+  $('favoritesView').textContent=`★ 관심목록 (${favorites.size})`;
+  $('favoritesView').classList.toggle('active',view==='favorites');
+  $('allView').classList.toggle('active',view==='all');
+  $('favoritesView').setAttribute('aria-pressed',String(view==='favorites'));
+  $('allView').setAttribute('aria-pressed',String(view==='all'));
+}
 
 function show(s){
- const metric=(label,value)=>`<div class="metric"><small class="muted">${safe(label)}</small><strong>${safe(value)}</strong></div>`;
- const money=v=>v==null?'—':fmt(v)+'원';
- const breakdown=s.scoreBreakdown;
- const categories=[['추세','trend',30],['RSI','rsi',20],['모멘텀','momentum',20],['거래량','volume',15],['변동성','volatility',15]];
- const scoring=breakdown?`<div class="insight"><h3>🧮 점수 산정 내역</h3><div class="metrics">${categories.map(([name,key,max])=>metric(name,`${breakdown[key]??0} / ${max}점`)).join('')}</div><small class="muted">점수는 기술적 조건 충족 정도이며 상승 확률이 아닙니다.</small></div>`:'<div class="insight"><p>이 데이터는 이전 분석 버전입니다. 다음 자동 갱신 후 세부 배점이 표시됩니다.</p></div>';
- const newMetrics=s.atr14!=null?[
- ['ATR (14)',money(s.atr14)],['ATR / 종가',`${s.atrPct}%`],
- ['20일 지지 참고',money(s.support20)],['60일 지지 참고',money(s.support60)],
- ['20일 저항 참고',money(s.resistance20)],['60일 저항 참고',money(s.resistance60)]
- ]:[];
- const metrics=[['종가',money(s.close)],['시가',money(s.open)],['고가',money(s.high)],['저가',money(s.low)],
- ['당일 거래량',s.volume==null?'—':fmt(s.volume)+'주'],['RSI (14)',s.rsi??'—'],
- ['20일 평균',money(s.ma20)],['60일 평균',money(s.ma60)],['거래량 배수',s.volumeRatio==null?'—':s.volumeRatio+'배'],
- ['20거래일 수익률',s.momentum20==null?'—':s.momentum20+'%'],...newMetrics,
- ['관심 가격 1차',money(s.buy1)],['관심 가격 2차',money(s.buy2)],['관심 가격 3차',money(s.buy3)],
- ['예시 손절 기준',money(s.stop)],['예시 목표 기준',money(s.target)]];
- $('detail').hidden=false;
- $('detail').innerHTML=`<h2>${safe(s.name)} <small class="muted">${safe(s.ticker)} · ${safe(s.market)}</small></h2>
- <p class="muted">기준일 ${safe(s.date)} · 기술적 분석 점수 ${safe(s.score)}/100 · 분석 v${safe(s.analysisVersion||'1.3')}</p>
- <div class="insight"><h3>📊 당일 주가 동향</h3><p>${safe(s.trendSummary||'당일 동향 정보가 없습니다.')}</p><small class="muted">당일 종가·거래량 기반</small></div>
- ${scoring}
- <div class="insight"><h3>💡 기술적 긍정 신호</h3><ul>${(s.reasons||[]).map(x=>`<li>${safe(x)}</li>`).join('')}</ul>
- <h3>⚠️ 유의할 위험 신호</h3><ul>${(s.risks||[]).map(x=>`<li>${safe(x)}</li>`).join('')}</ul>
- <small class="muted">뉴스·공시·수급·실적을 포함하지 않은 기술적 분석입니다.</small></div>
- <div class="metrics">${metrics.map(([k,v])=>metric(k,v)).join('')}</div>
- <div class="warn">${safe(s.priceMethod||'기존 버전: 종가 대비 고정 비율의 참고 가격')}입니다. ATR·지지·저항을 사용해도 실제 지지선, 체결 가격 또는 목표 달성을 보장하지 않습니다. 거래소 호가 단위는 별도 확인하세요.</div>`;
- $('detail').scrollIntoView({behavior:'smooth',block:'start'});
+  if(!s)return;
+  const metric=(label,value)=>`<div class="metric"><small class="muted">${safe(label)}</small><strong>${safe(value)}</strong></div>`;
+  const breakdown=s.scoreBreakdown;
+  const categories=[['추세','trend',30],['RSI','rsi',20],['모멘텀','momentum',20],['거래량','volume',15],['변동성','volatility',15]];
+  const scoring=breakdown?`<div class="insight"><h3>🧮 점수 산정 내역</h3><div class="metrics">${categories.map(([name,key,max])=>metric(name,`${breakdown[key]??0} / ${max}점`)).join('')}</div><small class="muted">점수는 기술적 조건 충족 정도이며 상승 확률이 아닙니다.</small></div>`:'<div class="insight"><p>이 데이터는 이전 분석 버전입니다. 다음 자동 갱신 후 세부 배점이 표시됩니다.</p></div>';
+  const newMetrics=s.atr14!=null?[['ATR (14)',money(s.atr14)],['ATR / 종가',`${s.atrPct??'—'}%`],['20일 지지 참고',money(s.support20)],['60일 지지 참고',money(s.support60)],['20일 저항 참고',money(s.resistance20)],['60일 저항 참고',money(s.resistance60)]]:[];
+  const metrics=[['종가',money(s.close)],['시가',money(s.open)],['고가',money(s.high)],['저가',money(s.low)],['당일 거래량',s.volume==null?'—':fmt(s.volume)+'주'],['RSI (14)',s.rsi??'—'],['20일 평균',money(s.ma20)],['60일 평균',money(s.ma60)],['거래량 배수',s.volumeRatio==null?'—':s.volumeRatio+'배'],['20거래일 수익률',s.momentum20==null?'—':s.momentum20+'%'],...newMetrics,['관심 가격 1차',money(s.buy1)],['관심 가격 2차',money(s.buy2)],['관심 가격 3차',money(s.buy3)],['예시 손절 기준',money(s.stop)],['예시 목표 기준',money(s.target)]];
+  $('detail').hidden=false;
+  $('detail').innerHTML=`<h2>${safe(s.name)} <small class="muted">${safe(s.ticker)} · ${safe(s.market)}</small></h2><p class="muted">기준일 ${safe(s.date)} · 기술적 분석 점수 ${safe(s.score)}/100 · 분석 v${safe(s.analysisVersion||'1.3')}</p><div class="insight"><h3>📊 당일 주가 동향</h3><p>${safe(s.trendSummary||'당일 동향 정보가 없습니다.')}</p><small class="muted">당일 종가·거래량 기반</small></div>${scoring}<div class="insight"><h3>💡 기술적 긍정 신호</h3><ul>${(Array.isArray(s.reasons)?s.reasons:[]).map(x=>`<li>${safe(x)}</li>`).join('')}</ul><h3>⚠️ 유의할 위험 신호</h3><ul>${(Array.isArray(s.risks)?s.risks:[]).map(x=>`<li>${safe(x)}</li>`).join('')}</ul><small class="muted">뉴스·공시·수급·실적을 포함하지 않은 기술적 분석입니다.</small></div><div class="metrics">${metrics.map(([k,v])=>metric(k,v)).join('')}</div><div class="warn">${safe(s.priceMethod||'기존 버전: 종가 대비 고정 비율의 참고 가격')}입니다. ATR·지지·저항을 사용해도 실제 지지선, 체결 가격 또는 목표 달성을 보장하지 않습니다. 거래소 호가 단위는 별도 확인하세요.</div>`;
+  $('detail').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function render(){
- let q=$('search').value.trim().toLowerCase(),market=$('market').value,sort=$('sort').value;
- let a=stocks.filter(s=>(market==='ALL'||s.market===market)&&(s.name.toLowerCase().includes(q)||s.ticker.includes(q)));
- a.sort((x,y)=>sort==='momentum'?y.momentum20-x.momentum20:sort==='volume'?y.volumeRatio-x.volumeRatio:y.score-x.score);
- $('list').innerHTML=a.length?a.map((s,i)=>`<button class="item" data-ticker="${safe(s.ticker)}"><span class="rank">${i+1}</span><span><span class="stockname">${safe(s.name)}</span><br><small class="muted">${safe(s.ticker)} · ${safe(s.market)} · ${safe(s.trend||'동향 갱신 대기')}</small></span><span><span class="score">${s.score}</span><small class="muted"> /100</small></span><span class="last"><strong>${fmt(s.close)}원</strong><br><small class="${s.change>=0?'up':'down'}">${s.change>0?'+':''}${s.change}%</small></span></button>`).join(''):'<div class="empty">표시할 종목이 없습니다. 아직 첫 데이터 수집이 실행되지 않았거나 검색 결과가 없습니다.</div>';
- $('list').querySelectorAll('[data-ticker]').forEach(b=>b.onclick=()=>show(stocks.find(s=>s.ticker===b.dataset.ticker)));
+  updateViewButtons();
+  const q=$('search').value.trim().toLowerCase(),market=$('market').value,sort=$('sort').value;
+  const a=stocks.filter(s=>(view==='all'||favorites.has(String(s.ticker)))&&(market==='ALL'||s.market===market)&&(String(s.name||'').toLowerCase().includes(q)||String(s.ticker||'').includes(q)));
+  a.sort((x,y)=>sort==='momentum'?number(y.momentum20)-number(x.momentum20):sort==='volume'?number(y.volumeRatio)-number(x.volumeRatio):number(y.score)-number(x.score));
+  $('list').innerHTML=a.length?a.map((s,i)=>{
+    const ticker=String(s.ticker),saved=favorites.has(ticker);
+    return `<div class="item"><span class="rank">${i+1}</span><button class="stockopen" data-open="${safe(ticker)}" aria-label="${safe(s.name)} 상세 분석"><span class="stockname">${safe(s.name)}</span><br><small class="muted">${safe(ticker)} · ${safe(s.market)} · ${safe(s.trend||'동향 갱신 대기')}</small></button><span><span class="score">${safe(s.score)}</span><small class="muted"> /100</small></span><span class="last"><strong>${money(s.close)}</strong><br><small class="${number(s.change)>=0?'up':'down'}">${number(s.change)>0?'+':''}${safe(s.change)}%</small></span><button class="star ${saved?'saved':''}" data-star="${safe(ticker)}" aria-label="${safe(s.name)} 관심종목 ${saved?'해제':'등록'}" aria-pressed="${saved}" ${pending.has(ticker)||!favoritesReady?'disabled':''}>${saved?'★':'☆'}</button></div>`;
+  }).join(''):`<div class="empty">${view==='favorites'?'관심종목이 없거나 검색·필터 조건에 맞는 관심종목이 없습니다.':'표시할 종목이 없습니다. 검색 조건이나 데이터 수집 상태를 확인하세요.'}</div>`;
+}
+
+$('list').addEventListener('click',e=>{
+  const star=e.target.closest('[data-star]');
+  if(star){toggleFavorite(star.dataset.star);return;}
+  const open=e.target.closest('[data-open]');
+  if(open)show(stocks.find(s=>String(s.ticker)===open.dataset.open));
+});
+
+async function toggleFavorite(ticker){
+  if(!currentUser||!favoritesReady||pending.has(ticker))return;
+  const uid=currentUser.uid;
+  const wasSaved=favorites.has(ticker);
+  pending.add(ticker);
+  render();
+  try{
+    const ref=doc(db,'users',uid,'favorites',ticker);
+    if(wasSaved)await deleteDoc(ref);
+    else await setDoc(ref,{ticker,createdAt:serverTimestamp()});
+    notice('');
+  }catch(e){
+    notice('관심종목 저장에 실패했습니다. Firestore 규칙과 네트워크를 확인하세요. ('+(e.code||'unknown')+')');
+  }finally{
+    pending.delete(ticker);
+    render();
+  }
+}
+
+function listenFavorites(user,generation){
+  if(unsubscribeFavorites)unsubscribeFavorites();
+  favoritesReady=false;
+  favorites=new Set();
+  render();
+  unsubscribeFavorites=onSnapshot(collection(db,'users',user.uid,'favorites'),snapshot=>{
+    if(generation!==authGeneration)return;
+    favorites=new Set(snapshot.docs.map(d=>d.id));
+    favoritesReady=true;
+    render();
+  },error=>{
+    if(generation!==authGeneration)return;
+    favoritesReady=false;
+    notice('관심종목 동기화에 실패했습니다: '+(error.code||'unknown')+'. Firestore 규칙을 확인하세요.');
+    render();
+  });
 }
 
 async function load(){
- try{
-  $('status').textContent='● 데이터 확인 중';
-  let snapshot=await getDocFromServer(doc(db,'market','latest'));
-  if(!snapshot.exists())throw Error('No market data');
-  meta=snapshot.data();
-  stocks=meta.stocks||[];
-  $('asof').textContent=meta.asOf||'수집 전';
-  $('count').textContent=stocks.length+' / '+(meta.universeCount||30)+'개';
-  $('updated').textContent=meta.updatedAt?new Date(meta.updatedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'수집 전';
-  $('status').textContent=stocks.length?'● 종가 데이터':'● 초기 데이터 없음';
-  render();
- }catch(e){
-  $('status').textContent='● 데이터 오류';
-  $('list').innerHTML='<div class="empty">'+safe(e.code==='permission-denied'?'접근 권한이 없습니다. 승인 상태와 Firestore 규칙을 확인하세요.':e.code==='unavailable'?'서버에 연결할 수 없습니다. 네트워크 상태를 확인하세요.':'데이터를 불러오지 못했습니다. GitHub Actions 및 Firestore market/latest를 확인하세요.')+'</div>';
- }
+  try{
+    $('status').textContent='● 데이터 확인 중';
+    const snapshot=await getDocFromServer(doc(db,'market','latest'));
+    if(!snapshot.exists())throw Error('No market data');
+    meta=snapshot.data();
+    stocks=Array.isArray(meta.stocks)?meta.stocks:[];
+    $('asof').textContent=meta.asOf||'수집 전';
+    $('count').textContent=stocks.length+' / '+(meta.universeCount||30)+'개';
+    $('updated').textContent=meta.updatedAt?new Date(meta.updatedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'수집 전';
+    $('status').textContent=stocks.length?'● 종가 데이터':'● 초기 데이터 없음';
+    $('detail').hidden=true;
+    render();
+  }catch(e){
+    $('status').textContent='● 데이터 오류';
+    $('list').innerHTML='<div class="empty">'+safe(e.code==='permission-denied'?'접근 권한이 없습니다. 승인 상태와 Firestore 규칙을 확인하세요.':e.code==='unavailable'?'서버에 연결할 수 없습니다. 네트워크 상태를 확인하세요.':'데이터를 불러오지 못했습니다. GitHub Actions 및 Firestore market/latest를 확인하세요.')+'</div>';
+  }
 }
+
 ['search','market','sort'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
 $('reload').onclick=load;
+$('favoritesView').onclick=()=>{view='favorites';$('detail').hidden=true;render();};
+$('allView').onclick=()=>{view='all';$('detail').hidden=true;render();};
 
-const configured=!!(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId);
+const configured=!!(firebaseConfig.apiKey&&firebaseConfig.projectId&&firebaseConfig.appId);
 if(!configured){
- $('authError').textContent='로그인 설정이 필요합니다. README.md를 보고 firebase-config.js를 설정하세요.';
- $('loginBtn').disabled=true;
-}
-else {
- const firebaseApp=initializeApp(firebaseConfig);
- const auth=getAuth(firebaseApp);
- db=getFirestore(firebaseApp);
- onAuthStateChanged(auth,async user=>{
-  $('auth').hidden=false;
-  $('app').hidden=true;
-  if(user){
-   try {
-    const approval=await getDoc(doc(db,'allowedUsers',user.uid));
-    if(!approval.exists() || approval.data().enabled!==true){
-     $('authError').textContent='관리자가 승인하지 않은 계정입니다.';
-     await signOut(auth);
-     return;
-    }
-    $('authError').textContent='';
-    $('auth').hidden=true;
-    $('app').hidden=false;
-    await load();
-   } catch(err) {
-    $('authError').textContent='계정 승인 확인에 실패했습니다. Firestore 설정과 보안 규칙을 확인하세요.';
-    await signOut(auth);
-   }
-  } else {
-   stocks=[];
-   meta={};
-   $('list').innerHTML='';
-   $('detail').hidden=true;
-  }
- },()=>{$('authError').textContent='인증 상태를 확인할 수 없습니다. 설정과 네트워크를 확인하세요.'});
- $('loginForm').addEventListener('submit',async e=>{
-  e.preventDefault();
-  $('authError').textContent='';
+  $('authError').textContent='로그인 설정이 필요합니다. firebase-config.js를 확인하세요.';
   $('loginBtn').disabled=true;
-  try{
-   await signInWithEmailAndPassword(auth,$('email').value.trim(),$('password').value);
-   $('password').value='';
-  }
-  catch(err){
-   $('authError').textContent=err.code==='auth/invalid-credential'?'이메일 또는 비밀번호가 올바르지 않습니다.':err.code==='auth/too-many-requests'?'로그인 시도가 너무 많습니다. 잠시 후 다시 시도하세요.':'로그인에 실패했습니다. Firebase 설정과 계정을 확인하세요.';
-  }
-  finally{$('loginBtn').disabled=false;}
- });
- $('signout').onclick=()=>signOut(auth);
+}else{
+  const firebaseApp=initializeApp(firebaseConfig);
+  auth=getAuth(firebaseApp);
+  db=getFirestore(firebaseApp);
+  onAuthStateChanged(auth,async user=>{
+    const generation=++authGeneration;
+    if(unsubscribeFavorites){unsubscribeFavorites();unsubscribeFavorites=null;}
+    currentUser=null;
+    favorites=new Set();
+    favoritesReady=false;
+    pending.clear();
+    $('auth').hidden=false;
+    $('app').hidden=true;
+    if(user){
+      try{
+        const approval=await getDocFromServer(doc(db,'allowedUsers',user.uid));
+        if(generation!==authGeneration)return;
+        if(!approval.exists()||approval.data().enabled!==true){
+          $('authError').textContent='관리자가 승인하지 않은 계정입니다.';
+          await signOut(auth);
+          return;
+        }
+        currentUser=user;
+        $('authError').textContent='';
+        $('auth').hidden=true;
+        $('app').hidden=false;
+        listenFavorites(user,generation);
+        await load();
+      }catch(err){
+        if(generation!==authGeneration)return;
+        $('authError').textContent='계정 승인 확인에 실패했습니다. Firestore 설정과 보안 규칙을 확인하세요.';
+        await signOut(auth);
+      }
+    }else{
+      stocks=[];meta={};view='all';
+      $('list').innerHTML='';
+      $('detail').hidden=true;
+      notice('');
+    }
+  },()=>{
+    $('authError').textContent='인증 상태를 확인할 수 없습니다. 설정과 네트워크를 확인하세요.';
+  });
+  $('loginForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    $('authError').textContent='';
+    $('loginBtn').disabled=true;
+    try{
+      await signInWithEmailAndPassword(auth,$('email').value.trim(),$('password').value);
+      $('password').value='';
+    }catch(err){
+      $('authError').textContent=err.code==='auth/invalid-credential'?'이메일 또는 비밀번호가 올바르지 않습니다.':err.code==='auth/too-many-requests'?'로그인 시도가 너무 많습니다. 잠시 후 다시 시도하세요.':'로그인에 실패했습니다. Firebase 설정과 계정을 확인하세요.';
+    }finally{
+      $('loginBtn').disabled=false;
+    }
+  });
+  $('signout').onclick=()=>signOut(auth);
 }
 </script>
 </body>
